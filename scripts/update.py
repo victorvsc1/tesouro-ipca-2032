@@ -3,6 +3,8 @@ import csv, io, json, re, sys
 from datetime import datetime
 from pathlib import Path
 import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
 SOURCE = "https://www.tesourotransparente.gov.br/ckan/dataset/df56aa42-484a-4a59-8184-7676580c81e3/resource/796d2059-14e9-44e3-80c9-2d9e30b405c1/download/precotaxatesourodireto.csv"
 OUT = Path(__file__).resolve().parents[1] / "data" / "ipca-2032.json"
@@ -28,8 +30,21 @@ def date(x):
         except ValueError: pass
     raise ValueError(f"Unsupported date: {x!r}")
 
+def fetch(url):
+    retry = Retry(
+        total=4,
+        backoff_factor=5,
+        status_forcelist=(429, 500, 502, 503, 504),
+        allowed_methods=("GET",),
+        raise_on_status=False,
+    )
+    session = requests.Session()
+    session.mount("https://", HTTPAdapter(max_retries=retry))
+    session.mount("http://", HTTPAdapter(max_retries=retry))
+    return session.get(url, timeout=(10, 120))
+
 def main():
-    r = requests.get(SOURCE, timeout=120)
+    r = fetch(SOURCE)
     r.raise_for_status()
     text = r.content.decode("utf-8-sig", errors="replace")
     try: dialect = csv.Sniffer().sniff(text[:10000], delimiters=";,")
