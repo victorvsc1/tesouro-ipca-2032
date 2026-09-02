@@ -56,8 +56,8 @@ def main():
     title = col(reader.fieldnames, ["Tipo Titulo", "Tipo do Titulo", "Titulo", "Título"])
     maturity = col(reader.fieldnames, ["Data Vencimento", "Data de Vencimento", "Vencimento"])
     dt = col(reader.fieldnames, ["Data Base", "Data", "Data Referencia", "Data de Referência"])
-    buy = col(reader.fieldnames, ["PU Compra", "Preço Compra", "Preco Compra", "Preço Unitário Compra", "Preco Unitario Compra"])
-    sell = col(reader.fieldnames, ["PU Venda", "Preço Venda", "Preco Venda", "Preço Unitário Venda", "Preco Unitario Venda"])
+    buy = col(reader.fieldnames, ["PU Compra", "PU Compra Manha", "Preço Compra", "Preco Compra", "Preço Unitário Compra", "Preco Unitario Compra"])
+    sell = col(reader.fieldnames, ["PU Venda", "PU Venda Manha", "Preço Venda", "Preco Venda", "Preço Unitário Venda", "Preco Unitario Venda"])
     missing = [n for n,v in {"title":title,"maturity":maturity,"date":dt,"buy":buy,"sell":sell}.items() if not v]
     if missing: raise RuntimeError("Missing CSV columns: " + ", ".join(missing))
 
